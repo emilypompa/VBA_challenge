@@ -1,0 +1,111 @@
+Sub Multiple_year_stock_data()
+
+For Each ws In Worksheets
+    ws.Range("I1").Value = "Ticker"
+    ws.Range("J1").Value = "Yearly Change"
+    ws.Range("K1").Value = "Percent Change"
+    ws.Range("L1").Value = "Total Stock Volume"
+    
+    Dim Ticker As String
+    Dim YearlyChange As Double
+    Dim PercentChange As Double
+    Dim Volume As Double
+    
+    Dim SummaryTableRow As Long
+    SummaryTableRow = 2
+    Dim lastrow As Long
+  lastrow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+  
+    
+For i = 2 To lastrow
+    If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1) Then
+        Ticker = ws.Cells(i, 1).Value
+        Volume = Volume + ws.Cells(i, 7).Value
+        
+        ws.Range("I" & SummaryTableRow).Value = Ticker
+        ws.Range("L" & SummaryTableRow).Value = Volume
+        Volume = 0
+        
+  Dim StockOpen As Double
+  Dim StockClose As Double
+  
+  StockClose = ws.Cells(i, 6)
+  
+  If StockOpen = 0 Then
+    YearlyChange = 0
+    PercentChange = 0
+Else:
+    YearlyChange = StockClose - StockOpen
+    PercentChange = (StockClose - StockOpen) / StockOpen
+End If
+
+ws.Range("J" & SummaryTableRow).Value = YearlyChange
+ws.Range("K" & SummaryTableRow).Value = PercentChange
+ws.Range("K" & SummaryTableRow).Style = "Percent"
+ws.Range("K" & SummaryTableRow).NumberFormat = "0.00%"
+
+SummaryTableRow = SummaryTableRow + 1
+ElseIf ws.Cells(i - 1, 1).Value <> ws.Cells(i, 1) Then
+    StockOpen = ws.Cells(i, 3)
+Else: Volume = Volume + ws.Cells(i, 7).Value
+End If
+Next i
+
+For r = 2 To lastrow
+
+    If ws.Range("J" & r).Value > 0 Then
+        ws.Range("J" & r).Interior.ColorIndex = 4
+    ElseIf ws.Range("J" & r).Value < 0 Then
+      ws.Range("J" & r).Interior.ColorIndex = 3
+    End If
+    Next r
+    
+
+ws.Range("O2").Value = "Greatest % Increase"
+ws.Range("O3").Value = "Greatest % Decrease"
+ws.Range("O4").Value = "Greatest Total Volume"
+ws.Range("P1").Value = "Ticker"
+ws.Range("Q1").Value = "Value"
+    Dim GreatestIncrease As Double
+    Dim GreatestDecrease As Double
+    Dim GreatestTotalVolume As Double
+    
+    GreatestIncrease = 0
+    GreatestDecrease = 0
+    GreatestTotalVolume = 0
+
+For a = 2 To lastrow
+    If ws.Cells(a, 11).Value > GreatestIncrease Then
+        GreatestIncrease = ws.Cells(a, 11).Value
+        ws.Range("Q2").Value = GreatestIncrease
+        ws.Range("Q2").Style = "Percent"
+        ws.Range("Q2").NumberFormat = "0.00%"
+        ws.Range("P2").Value = ws.Cells(a, 9).Value
+    End If
+    Next a
+
+For b = 2 To lastrow
+
+    If ws.Cells(b, 11).Value < GreatestDecrease Then
+        GreatestDecrease = ws.Cells(b, 11).Value
+        ws.Range("Q3").Value = GreatestDecrease
+        ws.Range("Q3").Style = "Percent"
+        ws.Range("Q3").NumberFormat = "0.00%"
+        ws.Range("P3").Value = ws.Cells(b, 9).Value
+    End If
+    Next b
+
+
+For c = 2 To lastrow
+
+    If ws.Cells(c, 12).Value > GreatestTotalVolume Then
+        GreatestTotalVolume = ws.Cells(c, 12).Value
+        ws.Range("Q4").Value = GreatestTotalVolume
+        ws.Range("P4").Value = ws.Cells(c, 9).Value
+
+End If
+Next c
+
+Next ws
+
+End Sub
